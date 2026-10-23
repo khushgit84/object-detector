@@ -1,0 +1,34 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Training runs & intermediate checkpoints
+runs/
+datasets/
+*.cache
+
+# Models exceeding GitHub 100MB limit
+# (These can be regenerated in seconds via train_oxford_visual_model.py or compiled on CUDA)
+models/oxford_universe_detector.pt
+models/universe_10000_mega_detector.pt
+models/universe_5000_mega_detector.pt
+models/master_1000_detector.pt
+models/precision_expert_detector.pt
+
+# Root base downloads
+/*.pt
+
+# Temporary & system files
+.DS_Store
+Thumbs.db
+*.log
+scratch/
+generate_user_room_artifact.py

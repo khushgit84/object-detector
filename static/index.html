@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OmniDetect AI - Unified General & Custom Object Detector Studio</title>
+  <meta name="description" content="State-of-the-art unified real-time and custom object detection studio powered by YOLO and PyTorch.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="navbar">
+    <div class="brand">
+      <div class="brand-icon">⚡</div>
+      <div class="brand-text">
+        <h1>OmniDetect AI</h1>
+        <span class="tagline">Unified Vision Studio</span>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-center" aria-label="Main Navigation">
+      <button class="nav-tab active" data-tab="camera-tab" id="tabBtnCamera">
+        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M4 4h3l2-2h6l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm8 3a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0 2a3 3 0 1 1 0 6 3 3 0 0 1 0-6z"/></svg>
+        Live Camera
+      </button>
+      <button class="nav-tab" data-tab="media-tab" id="tabBtnMedia">
+        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+        Image & Media
+      </button>
+      <button class="nav-tab" data-tab="trainer-tab" id="tabBtnTrainer">
+        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 14.5h-2v-2h2zm0-4h-2V7h2z"/></svg>
+        Custom Trainer
+      </button>
+      <button class="nav-tab" data-tab="oxford-tab" id="tabBtnOxford">
+        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
+        Oxford Lexicon & Looks
+      </button>
+      <button class="nav-tab" data-tab="guide-tab" id="tabBtnGuide">
+        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2zm1.07-7.75-.9.92C12.45 12.9 12 13.5 12 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/></svg>
+        How ML Works
+      </button>
+    </nav>
+
+    <!-- Model Switcher & Quick Actions -->
+    <div class="nav-actions">
+      <!-- Active Model Switcher -->
+      <div class="model-selector-wrapper" title="Switch between Oxford Visual Universe and Specialized Models">
+        <div class="model-badge-pulse"></div>
+        <select id="modelSelect" class="model-dropdown" aria-label="Select Active Model">
+          <option value="real_life_room_detector.pt" selected>🏠 Real-Life Room & Everyday Detector (User Room & Background)</option>
+          <option value="oxford_universe_detector.pt">📘 Oxford Dictionary Visual Model (14,000+ Items)</option>
+          <option value="universe_10000_mega_detector.pt">🌌 Universe 10,000 Mega Detector (10,000 Objects)</option>
+          <option value="precision_expert_detector.pt">🎯 Precision Expert Detector (79 Classes)</option>
+          <option value="general_yolo11n.pt">General (COCO 80 Classes)</option>
+        </select>
+      </div>
+
+      <!-- Scientific AI Dual-Stage Disambiguation Toggle -->
+      <button class="btn btn-secondary btn-sm scientific-btn active" id="btnToggleScientific" title="Dual-Stage Scientific Verification: Distinguishes Marker vs Pen vs Pencil, Phone vs TV using aspect morphology and multimodal vision science">
+        <span class="science-icon">🔬</span>
+        <span class="science-text">Scientific AI: ON</span>
+      </button>
+
+      <!-- Quick Upload Custom .pt Button -->
+      <button class="btn-icon" id="btnUploadModel" title="Upload custom trained .pt model">
+        <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>
+      </button>
+      <input type="file" id="modelFileInput" accept=".pt" style="display:none;">
+
+      <!-- Audio Alert Toggle -->
+      <button class="btn-icon" id="btnToggleAudio" title="Toggle Sound Alert on Object Detection">
+        <svg id="audioIcon" width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Viewports Container -->
+  <main class="main-wrapper">
+
+    <!-- ================= 10,000+ OBJECT SESSIONS & SECTIONS BAR ================= -->
+    <section class="session-universe-bar" id="sessionUniverseBar">
+      <div class="session-bar-inner">
+        <div class="session-bar-header">
+          <div class="session-tag-group">
+            <span class="session-pulse-dot"></span>
+            <span class="session-tag-title">DETECTION SESSIONS & SECTIONS (10,000+ UNIVERSE)</span>
+          </div>
+          <div class="session-active-info" id="sessionActiveInfo">
+            <span class="session-label">Session:</span>
+            <strong id="activeSessionName">All-in-One (10,000+ Objects)</strong>
+            <span class="session-count-badge" id="activeSessionCountBadge">10,000 Active</span>
+          </div>
+        </div>
+
+        <div class="session-pills-scroll" id="sessionPillsScroll">
+          <button class="session-pill active" data-section="all" id="pill-all">
+            <span class="pill-icon">🌐</span>
+            <span class="pill-text">All-in-One Session</span>
+            <span class="pill-badge">10,000+</span>
+          </button>
+          <button class="session-pill" data-section="stationery" id="pill-stationery">
+            <span class="pill-icon">✏️</span>
+            <span class="pill-text">Stationery & Writing</span>
+            <span class="pill-badge">50</span>
+          </button>
+          <button class="session-pill" data-section="electronics" id="pill-electronics">
+            <span class="pill-icon">💻</span>
+            <span class="pill-text">Electronics & Audio</span>
+            <span class="pill-badge">58</span>
+          </button>
+          <button class="session-pill" data-section="personal_care" id="pill-personal_care">
+            <span class="pill-icon">🧴</span>
+            <span class="pill-text">Perfumes, Bottles & Care</span>
+            <span class="pill-badge">44</span>
+          </button>
+          <button class="session-pill" data-section="furniture" id="pill-furniture">
+            <span class="pill-icon">🛋️</span>
+            <span class="pill-text">Furniture & Home Decor</span>
+            <span class="pill-badge">117</span>
+          </button>
+          <button class="session-pill" data-section="sports" id="pill-sports">
+            <span class="pill-icon">⚾</span>
+            <span class="pill-text">Sports & Recreation</span>
+            <span class="pill-badge">70</span>
+          </button>
+          <button class="session-pill" data-section="kitchen_dining" id="pill-kitchen_dining">
+            <span class="pill-icon">🍽️</span>
+            <span class="pill-text">Kitchen & Dining</span>
+            <span class="pill-badge">80</span>
+          </button>
+          <button class="session-pill" data-section="vehicles" id="pill-vehicles">
+            <span class="pill-icon">🚗</span>
+            <span class="pill-text">Vehicles & Transport</span>
+            <span class="pill-badge">79</span>
+          </button>
+          <button class="session-pill" data-section="tools_hardware" id="pill-tools_hardware">
+            <span class="pill-icon">🛠️</span>
+            <span class="pill-text">Tools & Hardware</span>
+            <span class="pill-badge">60</span>
+          </button>
+          <button class="session-pill" data-section="clothing" id="pill-clothing">
+            <span class="pill-icon">👕</span>
+            <span class="pill-text">Clothing & Apparel</span>
+            <span class="pill-badge">103</span>
+          </button>
+          <button class="session-pill" data-section="animals_nature" id="pill-animals_nature">
+            <span class="pill-icon">🐕</span>
+            <span class="pill-text">Animals & Nature</span>
+            <span class="pill-badge">263</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= TAB 1: LIVE CAMERA HUB ================= -->
+    <section id="camera-tab" class="tab-content active">
+      <div class="studio-grid">
+
+        <!-- Viewport Stage -->
+        <div class="viewport-card">
+          <div class="viewport-header">
+            <div class="viewport-title">
+              <span>Real-Time Stream</span>
+              <span class="viewport-badge" id="cameraStatusBadge">STANDBY</span>
+            </div>
+            <div class="viewport-controls">
+              <button class="btn btn-secondary btn-sm" id="btnToggleNativeCam">
+                Switch to Native OpenCV Cam
+              </button>
+            </div>
+          </div>
+
+          <div class="viewport-stage" id="cameraStage">
+            <!-- HUD Overlays -->
+            <div class="hud-overlay-top">
+              <div class="hud-pill">FPS: <span class="val" id="camFpsVal">0.0</span></div>
+              <div class="hud-pill">Latency: <span class="val" id="camLatencyVal">0 ms</span></div>
+              <div class="hud-pill">Detections: <span class="val" id="camDetectionsVal">0</span></div>
+            </div>
+
+            <!-- Video & Canvas Overlays -->
+            <video id="cameraVideo" autoplay playsinline muted></video>
+            <canvas id="cameraCanvas"></canvas>
+            <img id="nativeCamFeed" style="display:none; max-width:100%; max-height:680px;" alt="Native OpenCV Feed">
+
+            <!-- Training Reticle for Sample Snapping -->
+            <div class="camera-reticle" id="cameraReticle"></div>
+          </div>
+
+          <!-- Viewport Bottom Action Bar -->
+          <div class="viewport-footer">
+            <div style="display:flex; gap:10px;">
+              <button class="btn btn-primary" id="btnStartCamera">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                Start Camera
+              </button>
+              <button class="btn btn-danger" id="btnStopCamera" style="display:none;">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M6 6h12v12H6z"/></svg>
+                Stop Camera
+              </button>
+            </div>
+
+            <div style="display:flex; gap:10px;">
+              <button class="btn btn-secondary" id="btnSnapSample">
+                📸 Snap for Custom Dataset
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar HUD Controls -->
+        <aside class="controls-dock">
+          <!-- Sensitivity Controls -->
+          <div class="dock-card">
+            <div class="dock-card-title">
+              <span>Detection Sensitivity</span>
+            </div>
+
+            <div class="setting-row">
+              <div class="setting-label">
+                <span>Confidence Threshold <strong style="color:var(--accent-emerald); font-size:10px;">(50% Min Filter)</strong></span>
+                <span id="confVal">50%</span>
+              </div>
+              <input type="range" class="slider-input" id="confSlider" min="10" max="95" value="50">
+            </div>
+
+            <div class="setting-row">
+              <div class="setting-label">
+                <span>IoU (NMS Overlap)</span>
+                <span id="iouVal">45%</span>
+              </div>
+              <input type="range" class="slider-input" id="iouSlider" min="10" max="90" value="45">
+            </div>
+          </div>
+
+          <!-- Detected Objects Live Summary -->
+          <div class="dock-card">
+            <div class="dock-card-title">
+              <span>Detected Objects</span>
+              <span id="liveDetCount" style="color:var(--accent-cyan); font-family:var(--font-mono);">0 Items</span>
+            </div>
+            <div class="detections-feed" id="liveDetectionsList">
+              <span style="color:var(--text-dim); font-size:12px;">Start camera to see live detections...</span>
+            </div>
+          </div>
+
+          <!-- Model Info & Active Classes -->
+          <div class="dock-card">
+            <div class="dock-card-title">
+              <span>Active Model Classes</span>
+              <span id="totalClassesCount" style="font-size:11px; color:var(--text-muted);">80 Classes</span>
+            </div>
+            <div style="max-height: 180px; overflow-y: auto; font-size: 12px; color: var(--text-muted);" id="classListContainer">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </aside>
+
+      </div>
+    </section>
+
+
+    <!-- ================= TAB 2: IMAGE & MEDIA STUDIO ================= -->
+    <section id="media-tab" class="tab-content">
+      <div class="studio-grid">
+
+        <div class="viewport-card">
+          <div class="viewport-header">
+            <div class="viewport-title">
+              <span>Image & Media Analysis</span>
+              <span class="viewport-badge" id="imageBadge">READY</span>
+            </div>
+            <div class="viewport-controls">
+              <button class="btn btn-secondary btn-sm" id="btnDownloadAnnotated" style="display:none;">
+                ⬇ Download Annotated
+              </button>
+            </div>
+          </div>
+
+          <div class="viewport-stage" id="imageStage">
+            <!-- Dropzone -->
+            <div class="dropzone" id="imageDropzone">
+              <div class="dropzone-icon">📁</div>
+              <div class="dropzone-title">Drag & Drop an Image or Click to Browse</div>
+              <div class="dropzone-desc">Supports JPG, PNG, WebP (Images analyzed with current active model)</div>
+              <input type="file" id="imageFileInput" accept="image/*" style="display:none;">
+            </div>
+
+            <!-- Preview Image -->
+            <div id="imageStageContainer">
+              <img id="imagePreview" alt="Processed Detection Image">
+            </div>
+          </div>
+
+          <div class="viewport-footer">
+            <button class="btn btn-secondary" onclick="document.getElementById('imageFileInput').click()">
+              Choose Another Image
+            </button>
+            <div id="imageStatsSummary" style="font-size:13px; color:var(--text-muted); font-family:var(--font-mono);"></div>
+          </div>
+        </div>
+
+        <!-- Sidebar / Media Breakdown -->
+        <aside class="controls-dock">
+          <div class="dock-card">
+            <div class="dock-card-title">
+              <span>Image Detections</span>
+            </div>
+            <div class="detections-feed" id="imageDetectionsFeed">
+              <span style="color:var(--text-dim); font-size:12px;">No image uploaded yet.</span>
+            </div>
+          </div>
+
+          <div class="dock-card">
+            <div class="dock-card-title">
+              <span>Detection Coordinates</span>
+            </div>
+            <div id="imageBoxesList" style="max-height: 280px; overflow-y: auto; font-size: 12px; font-family: var(--font-mono);">
+              <span style="color:var(--text-dim);">Coordinates will appear here...</span>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+    </section>
+
+
+    <!-- ================= TAB 3: CUSTOM MODEL TRAINER ================= -->
+    <section id="trainer-tab" class="tab-content">
+      <div class="trainer-grid">
+
+        <!-- Training Configuration Card -->
+        <div class="trainer-card">
+          <div class="trainer-step-header">
+            <div class="step-num">1</div>
+            <h3>Create / Select Dataset</h3>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="datasetSelect">Select Existing Dataset</label>
+            <select id="datasetSelect" class="form-select">
+              <option value="">-- No dataset selected --</option>
+            </select>
+          </div>
+
+          <div style="margin-bottom:16px;">
+            <button class="btn btn-secondary btn-full btn-sm" id="btnGenerateDemoDataset">
+              ⚡ Generate Instant Demo Dataset (3 Custom Classes)
+            </button>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Or Create New Dataset</label>
+            <input type="text" id="newDatasetName" class="form-input" placeholder="e.g. coffee_mug_detector" style="margin-bottom:8px;">
+            <input type="text" id="newDatasetClasses" class="form-input" placeholder="Classes (comma-separated, e.g. mug, coaster)">
+            <button class="btn btn-secondary btn-full btn-sm" id="btnCreateDataset" style="margin-top:8px;">
+              Create Dataset
+            </button>
+          </div>
+
+          <hr style="border:none; border-top:1px solid var(--border-glass); margin:20px 0;">
+
+          <div class="trainer-step-header">
+            <div class="step-num">2</div>
+            <h3>Training Parameters</h3>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="trainModelName">Output Model Name</label>
+            <input type="text" id="trainModelName" class="form-input" value="custom_detector_v1">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="trainEpochs">Number of Epochs</label>
+            <select id="trainEpochs" class="form-select">
+              <option value="5" selected>5 Epochs (Fast test ~20s on GPU)</option>
+              <option value="10">10 Epochs (Balanced ~45s)</option>
+              <option value="25">25 Epochs (High Accuracy ~1.5m)</option>
+            </select>
+          </div>
+
+          <button class="btn btn-emerald btn-full" id="btnStartTraining">
+            🚀 Launch Custom Model Training
+          </button>
+        </div>
+
+        <!-- Training Live Monitor & Terminal -->
+        <div class="trainer-card">
+          <div class="viewport-header" style="background:transparent; padding:0 0 14px 0;">
+            <div class="viewport-title">
+              <span>Live Training Monitor</span>
+              <span class="viewport-badge" id="trainStatusBadge">IDLE</span>
+            </div>
+            <div id="trainDeviceBadge" style="font-size:12px; color:var(--accent-emerald);">
+              ⚡ NVIDIA CUDA Accelerated
+            </div>
+          </div>
+
+          <!-- Progress Bar & Metrics -->
+          <div>
+            <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:600;">
+              <span>Epoch Progress: <span id="trainEpochCount" style="color:var(--accent-cyan);">0/0</span></span>
+              <span>Overall Progress: <span id="trainProgressPercent" style="color:var(--accent-cyan);">0%</span></span>
+            </div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" id="trainProgressBar"></div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px;">
+              <div class="dock-card" style="padding:10px 14px;">
+                <div style="font-size:11px; color:var(--text-muted);">Current Box Loss</div>
+                <div style="font-size:18px; font-weight:700; color:var(--accent-magenta); font-family:var(--font-mono);" id="trainLossVal">0.000</div>
+              </div>
+              <div class="dock-card" style="padding:10px 14px;">
+                <div style="font-size:11px; color:var(--text-muted);">Validation mAP@50</div>
+                <div style="font-size:18px; font-weight:700; color:var(--accent-emerald); font-family:var(--font-mono);" id="trainMapVal">0.000</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Terminal Output -->
+          <div class="terminal-window" id="trainingTerminal">
+            <div class="terminal-line info">[System ready] Select a dataset and launch training to monitor GPU epochs here.</div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- ================= TAB 4: HOW IT WORKS & ML GUIDE ================= -->
+    <section id="guide-tab" class="tab-content">
+      <div style="margin-bottom:20px;">
+        <h2 style="font-size:24px; font-weight:800; margin-bottom:6px;">How Object Detection & Machine Learning Work</h2>
+        <p style="color:var(--text-muted); font-size:14px;">A complete primer on deep neural networks, computer vision, and real-time detection architectures.</p>
+      </div>
+
+      <div class="primer-cards">
+        <div class="primer-card">
+          <div class="primer-badge">Concept 1</div>
+          <div class="primer-title">Classification vs. Detection</div>
+          <div class="primer-text">
+            <strong>Image Classification</strong> looks at the whole image and outputs a single label (e.g. "Cat").<br><br>
+            <strong>Object Detection</strong> identifies <em>multiple objects</em>, figures out <em>where</em> they are, and outputs a bounding box <code>[x, y, w, h]</code> for every single one with an individual confidence score.
+          </div>
+        </div>
+
+        <div class="primer-card">
+          <div class="primer-badge">Concept 2</div>
+          <div class="primer-title">The Neural Network Backbone</div>
+          <div class="primer-text">
+            Deep Convolutional Networks (CNNs) pass the image through dozens of layers. Early layers find lines and edges; middle layers combine them into shapes and textures; deeper layers recognize whole object components (like car wheels, dog ears, or human faces).
+          </div>
+        </div>
+
+        <div class="primer-card">
+          <div class="primer-badge">Concept 3</div>
+          <div class="primer-title">Bounding Boxes & IoU</div>
+          <div class="primer-text">
+            The model predicts four coordinates for each box. To filter out overlapping duplicate guesses, it uses <strong>NMS (Non-Maximum Suppression)</strong> and calculates <strong>IoU (Intersection over Union)</strong>—keeping only the highest-confidence bounding box.
+          </div>
+        </div>
+
+        <div class="primer-card">
+          <div class="primer-badge">Concept 4</div>
+          <div class="primer-title">Why YOLO is Revolutionizing Vision</div>
+          <div class="primer-text">
+            Older algorithms (like R-CNN) ran in two separate passes: first proposing regions, then classifying them. <strong>YOLO (You Only Look Once)</strong> predicts boxes and classes in a single forward pass, reaching 60+ FPS on consumer GPUs!
+          </div>
+        </div>
+
+        <div class="primer-card">
+          <div class="primer-badge">Concept 5</div>
+          <div class="primer-title">Transfer Learning for Custom Items</div>
+          <div class="primer-text">
+            Instead of training a model from scratch with millions of photos, we take the pre-trained weights (which already understand edges and lighting) and <strong>fine-tune</strong> just the final detection heads on 20–50 photos of your custom item.
+          </div>
+        </div>
+
+        <div class="primer-card">
+          <div class="primer-badge">Concept 6</div>
+          <div class="primer-title">Evaluation Metrics: mAP</div>
+          <div class="primer-text">
+            Object detectors are evaluated using <strong>mAP (mean Average Precision)</strong>. <strong>mAP@50</strong> measures how often the model detects the right item with at least 50% bounding box overlap with the true location.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= TAB 5: OXFORD DICTIONARY & VISUAL LOOKS ================= -->
+    <section id="oxford-tab" class="tab-content">
+      <div class="dock-card" style="margin-bottom:20px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+          <div>
+            <h2 style="font-size:20px; font-weight:700; color:#fff; display:flex; align-items:center; gap:8px;">
+              <span>📘</span> Oxford Dictionary Visual Knowledge Base
+            </h2>
+            <p style="font-size:13px; color:var(--text-muted); margin-top:4px;">
+              14,275 tangible physical items compiled with their Oxford definitions, optical morphology, and physical looks.
+            </p>
+          </div>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <span class="session-count-badge" style="background:rgba(0, 240, 255, 0.15); color:var(--accent-cyan); border-color:rgba(0,240,255,0.3);">
+              50% Min Confidence Filter Active
+            </span>
+          </div>
+        </div>
+
+        <div style="margin-top:16px; display:flex; gap:12px;">
+          <input type="text" id="oxfordSearchInput" class="text-input" placeholder="Search Oxford item (e.g. marker, pen, pencil, smartphone, television, perfume bottle, water bottle, baseball bat)..." style="flex:1;">
+          <button class="btn btn-primary" id="btnOxfordSearch">Search Lexicon</button>
+        </div>
+      </div>
+
+      <!-- Lexicon Grid -->
+      <div id="oxfordGrid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap:16px;">
+        <!-- Dynamically populated by app.js -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Audio element for chime -->
+  <audio id="alertAudio" preload="auto">
+    <source src="data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU9vT18A/38A/38A/38A/38A/38A/38A/38A/38A/38A/38A/38A/38A/38A/38A/38A/38A/38A/38A/38A/38A/38A/38A/38A/38A/38A/38A/38A/38A/38A/38A/38A/38A/38A/38A/38A/38A/38A/38A/38A/38A/38A/38A/38A/38A/38A/38A/38A/38A/38A/38A/38A/38A" type="audio/wav">
+  </audio>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
