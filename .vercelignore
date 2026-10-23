@@ -1,0 +1,14 @@
+# Ignore large binary models to keep deployment fast and within Vercel's 250MB limit
+models/*.pt
+*.pt
+runs/
+datasets/
+__pycache__/
+*.pyc
+.git/
+.env
+.env.local
+*.log
+scratch/
+samples/*.jpg
+!samples/home_item_1.jpg

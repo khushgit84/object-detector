@@ -32,3 +32,6 @@ Thumbs.db
 *.log
 scratch/
 generate_user_room_artifact.py
+
+.vercel
+.env*
